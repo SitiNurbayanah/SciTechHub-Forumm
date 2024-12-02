@@ -1,34 +1,34 @@
 <?php
 
-namespace App\Http\Livewire\Reply;
+namespace App\Http\Livewire\Thread;
 
-use App\Models\Reply;
 use Livewire\Component;
-use App\Policies\ReplyPolicy;
+use App\Policies\ThreadPolicy;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class Delete extends Component
 {
     use AuthorizesRequests;
-    public $replyId;
-    public $page;
 
-    public function mount($page)
+    public $thread;
+    public $confirmingThreadDeletion = false;
+
+    public function confirmThreadDeletion()
     {
-        $this->page = $page;
+        $this->resetErrorBag();
+        $this->confirmingThreadDeletion = true;
     }
 
-
-    public function deleteReply()
+    public function deleteThread()
     {
-        $reply = Reply::findOrFail($this->replyId);
-        $this->authorize(ReplyPolicy::DELETE, $reply);
-        $reply->delete();
-        $this->emitUp('deleteReply', $this->page);
+        $this->authorize(ThreadPolicy::DELETE, $this->thread);
+        $this->thread->delete();
+        session()->flash('success', 'Thread Deleted!');
+        return redirect()->route('threads.index');
     }
 
     public function render()
     {
-        return view('livewire.reply.delete');
+        return view('livewire.thread.delete');
     }
 }
